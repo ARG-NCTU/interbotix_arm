@@ -1,0 +1,6 @@
+[submodule "gazebo-pkgs"]
+	path = gazebo-pkgs
+	url = https://github.com/ARG-NCTU/gazebo-pkgs
+[submodule "gazebo-plugin-message"]
+	path = gazebo-plugin-message
+	url = git@github.com:ARG-NCTU/gazebo-plugin-message.git
