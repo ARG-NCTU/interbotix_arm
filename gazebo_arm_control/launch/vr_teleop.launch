@@ -1,5 +1,6 @@
 <launch>
 	<!-- with this node gazebo arm will get the data from VR side-->
+	<arg name="use_sim" default="true"/>
 	<arg name="robot_name" default="wx250"/>
 	<node name="vr_teleop" pkg="gazebo_arm_control" type="vrarm.py" output="screen">
 		<param name="robot_name" type="string" value="$(arg robot_name)"/>
@@ -7,8 +8,8 @@
 
 	<!-- with this launch file and node you can use set_ee_pose python command to move end-effector pose -->
 	<include file="$(find interbotix_xsarm_control)/launch/xsarm_control_gazebo.launch">
-		<arg name="robot_model" value="wx250"/>
-		<arg name="use_sim" value="true"/>
+		<arg name="robot_model" value="$(arg robot_name)"/>
+		<arg name="use_sim" value="$(arg use_sim)"/>
 
 	</include>
 	<node name="gazebo_sdk_bridge" pkg="gazebo_arm_control" type="set_ee_pose.py" output="screen">
