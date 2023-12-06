@@ -13,7 +13,7 @@ from std_srvs.srv import Trigger, TriggerResponse
 from sensor_msgs.msg import JointState
 
 class gazebo_arm_control():
-    def __init__(self, robot_name="wx250"):
+    def __init__(self, robot_name="wx200"):
         #subscribe message from unity
         self.sub_primary = rospy.Subscriber("/vr/right/primarybutton", Bool, self.primarybutton_callback,queue_size=1)	#gripper open
         self.sub_second = rospy.Subscriber("/vr/right/secondarybutton", Bool, self.secondarybutton_callback,queue_size=1) #gripper close
@@ -37,8 +37,8 @@ class gazebo_arm_control():
     def initial(self, req):
         res = TriggerResponse()
         try:
-            joint_value =[0.0, 0.8, -1.0, 0.0, 0.0] #for upside down case
-            # joint_value =[0.0, -1.5, 2.0, 0.0, 0.0]
+            #joint_value =[0.0, 0.8, -1.0, 0.0, 0.0] #for upside down case
+            joint_value =[0.0, -1.5, 2.0, 0.0, 0.0]
             self.pub_arm(joint_value)
             res.success = True
         except (rospy.ServiceException, rospy.ROSException) as e:

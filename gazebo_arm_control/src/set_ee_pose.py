@@ -13,7 +13,7 @@ from sensor_msgs.msg import JointState
 
 
 class gazebo_interbotix_sdk_bridge:
-    def __init__(self, robot_name='wx250'):
+    def __init__(self, robot_name='wx200'):
         #pose to joint_state using interbotix_sdk
         self.sub_end_effector_pose = rospy.Subscriber("/end_effector_pose", Pose, self.pose_callback, queue_size=1)
         self.pub_joint_state_from_catersian  = rospy.Publisher("/joint_states_from_api", JointState, queue_size=1)
@@ -108,11 +108,11 @@ if __name__  == "__main__":
     robot_name = rospy.get_param("~robot_name")
     gazebo_control = gazebo_interbotix_sdk_bridge(robot_name)
     while not rospy.is_shutdown():
-        # key = raw_input("please input key: ").strip()
-        # if key == 'q':
-        #     break
-        # else:
-        #     gazebo_control.control_end_effector(key)
-        pass
+        key = raw_input("please input key: ").strip()
+        if key == 'q':
+            break
+        else:
+            gazebo_control.control_end_effector(key)
+        # pass
     #rospy.spin()
     
