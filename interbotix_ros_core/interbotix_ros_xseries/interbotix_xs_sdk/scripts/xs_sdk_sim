@@ -462,7 +462,7 @@ class InterbotixRobotXS(object):
                             self.joint_states.position[self.js_index_map[gpr["right_finger"]]] = -lin_pos
 
             self.joint_states.header.stamp = rospy.Time.now()
-            self.pub_joint_states.publish(self.joint_states)
+            # self.pub_joint_states.publish(self.joint_states) #when use sim data will go directly to gazebo, no need for xs_sdk
 
 def main():
     rospy.init_node('xs_sdk_sim')
