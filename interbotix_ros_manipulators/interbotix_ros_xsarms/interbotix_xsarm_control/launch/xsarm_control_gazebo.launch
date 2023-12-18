@@ -12,7 +12,7 @@
   <arg name="use_rviz"                          default="false"/>
   <arg name="motor_configs"                     default="$(find interbotix_xsarm_control)/config/$(arg robot_model).yaml"/>
   <arg name="mode_configs"                      default="$(find interbotix_xsarm_control)/config/modes.yaml"/>
-  <arg name="load_configs"                      default="true"/>
+  <arg name="load_configs"                      default="false"/>
   <arg name="use_sim"                           default="false"/>
 
   <arg name="xs_sdk_type" value="xs_sdk" unless="$(arg use_sim)"/>
@@ -31,7 +31,7 @@
     </include>
   </group>
   
-
+  
   <node
     name="xs_sdk"
     pkg="interbotix_xs_sdk"
