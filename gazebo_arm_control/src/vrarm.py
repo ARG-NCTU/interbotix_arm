@@ -117,7 +117,7 @@ class gazebo_arm_control():
         self.pub_shoulder.publish(joint_value[1])
         self.pub_elbow.publish(joint_value[2])
         self.pub_wrist_angle.publish(joint_value[3])
-        self.pub_wrist_rotate.publish(joint_value[4])
+        self.pub_wrist_rotate.publish(-joint_value[4]) # multiply -1 for reverse arm
 
     def pub_finger(self, finger_state):
         if finger_state == "open":

@@ -23,4 +23,11 @@
 		<param name="keyboard_control" value="$(arg debug)"/>
 	</node>
 
+	<group if="$(arg use_sim)">
+		<node name="endeffector_fix" pkg="gazebo_arm_control" type="endeffector_rotate_fix.py">
+			<remap from="joint_states" to="$(arg robot_name)/joint_states"/>
+			<remap from="joint_states_fix" to="$(arg robot_name)/joint_states_fix"/>
+		</node>
+	</group>
+
 </launch>
