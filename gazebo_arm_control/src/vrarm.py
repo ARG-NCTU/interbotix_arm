@@ -17,7 +17,7 @@ class gazebo_arm_control():
     def __init__(self, robot_name="wx200", use_sim=True):
         #subscribe message from unity
         self.sub_primary = rospy.Subscriber("/vr/right/primarybutton", Bool, self.primarybutton_callback,queue_size=1)	#gripper open
-        self.sub_second = rospy.Subscriber("/vr/right/secondarybutton", Bool, self.secondarybutton_callback,queue_size=1) #gripper close
+        #self.sub_second = rospy.Subscriber("/vr/right/secondarybutton", Bool, self.secondarybutton_callback,queue_size=1) #gripper close
         self.sub_jointstate = rospy.Subscriber("/joint_states_test", JointState, self.jointstate_callback, queue_size=1)
         self.use_sim = use_sim
         if self.use_sim:  
@@ -36,6 +36,7 @@ class gazebo_arm_control():
         gripper_open = rospy.Service("/gripper_open", Trigger, self.gripper_open)
         gripper_close = rospy.Service("/gripper_close", Trigger, self.gripper_close)
         push = rospy.Service("/push", Trigger, self.push)
+        grasp_pose = rospy.Service("/grasp_pose", Trigger, self.grasp_pose)
 
         self.bot = InterbotixManipulatorXS(robot_model = robot_name, group_name = "arm", gripper_name = "gripper", init_node = False, moving_time = 0.5, accel_time=0.3)
 
@@ -56,7 +57,7 @@ class gazebo_arm_control():
     def flypose(self, req):
         res = TriggerResponse()
         try:
-            joint_value = [0.0, 0.8, -1.0, 0.0, 0.0]
+            joint_value = [0.0009009980741545576, -1.3184024200773958, 1.617598039350118, -2.30828725668373025, -0.00013571852838190068]
             if self.use_sim:
                 self.pub_arm(joint_value)
             else:
@@ -67,6 +68,19 @@ class gazebo_arm_control():
             print("Service call failed: %s"%e)
         return res
 
+    def grasp_pose(self, req):
+        res = TriggerResponse()
+        try:
+            joint_value = [0.0, 0.0, 0.0, 0.0, 0.0]
+            if self.use_sim:
+                self.pub_arm(joint_value)
+            else:
+                self.bot.arm.set_joint_positions(joint_value)
+            res.success = True
+        except (rospy.ServiceException, rospy.ROSException) as e:
+            res.success = False
+            print("Service call failed: %s"%e)
+        return res
         
     def gripper_open(self, req):
         res = TriggerResponse()
@@ -136,16 +150,19 @@ class gazebo_arm_control():
             else:
                 self.bot.gripper.open()
         else:
-            pass
-
-    def secondarybutton_callback(self, msg):
-        if msg.data == True:
             if self.use_sim:
                 self.pub_finger("close")
             else:
                 self.bot.gripper.close()
-        else:
-            pass
+
+    # def secondarybutton_callback(self, msg):
+    #     if msg.data == True:
+    #         if self.use_sim:
+    #             self.pub_finger("close")
+    #         else:
+    #             self.bot.gripper.close()
+    #     else:
+    #         pass
     def jointstate_callback(self, joint_data):
         if self.use_sim:
             self.pub_arm(joint_data.position)
