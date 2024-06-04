@@ -17,7 +17,7 @@ shoulder_controller:
 elbow_controller:
   type: effort_controllers/JointPositionController
   joint: elbow
-  pid: {p: 250.0, i: 0.0, d: 0.0}
+  pid: {p: 100, i: 0.0, d: 0.0}
 
 wrist_angle_controller:
   type: effort_controllers/JointPositionController
