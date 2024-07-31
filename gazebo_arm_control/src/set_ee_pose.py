@@ -116,10 +116,10 @@ class gazebo_interbotix_sdk_bridge:
         first_point = True
         for x, y, z in trajectory:
             if first_point:
-                joint_angle_list, find_ans = self.bot.arm.set_ee_pose_components(x=x, y=y, z=z, moving_time=1, accel_time=0.3)
+                joint_angle_list, find_ans = self.bot.arm.set_ee_pose_components(x=x, y=y, z=z, moving_time=3, accel_time=0.8)
                 first_point = False
             rospy.loginfo("Moving to x={}, y={}, z={}".format(x, y, z))
-            joint_angle_list, find_ans = self.bot.arm.set_ee_pose_components(x=x, y=y, z=z, moving_time=0.05, accel_time=0.01)
+            joint_angle_list, find_ans = self.bot.arm.set_ee_pose_components(x=x, y=y, z=z, moving_time=0.1, accel_time=0.03)
             if find_ans:
                 print(joint_angle_list)
                 joint_state = JointState()
@@ -165,7 +165,6 @@ class gazebo_interbotix_sdk_bridge:
 
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
                 rospy.loginfo("Error in getting transform: %s" % e)
-        
 if __name__  == "__main__":
     rospy.init_node("gazebo_sdk_bridge")
     #robot_name = "wx250"

@@ -48,7 +48,8 @@ class gazebo_arm_control():
             if self.use_sim:
                 self.pub_arm(joint_value)
             else:
-                self.bot.arm.set_joint_positions(joint_value)
+                moving_time, accel_time = self.calculate_times(joint_value)
+                self.bot.arm.set_joint_positions(joint_value, moving_time=moving_time, accel_time=accel_time)
             res.success = True
         except (rospy.ServiceException, rospy.ROSException) as e:
             res.success = False
@@ -57,11 +58,12 @@ class gazebo_arm_control():
     def flypose(self, req):
         res = TriggerResponse()
         try:
-            joint_value = [0.0009009980741545576, -1.3184024200773958, 1.617598039350118, -2.30828725668373025, -0.00013571852838190068]
+            joint_value = [0.0004, -0.609, 0.808, -1.154, 0]
             if self.use_sim:
                 self.pub_arm(joint_value)
             else:
-                self.bot.arm.set_joint_positions(joint_value)
+                moving_time, accel_time = self.calculate_times(joint_value)
+                self.bot.arm.set_joint_positions(joint_value, moving_time=moving_time, accel_time=accel_time)
             res.success = True
         except (rospy.ServiceException, rospy.ROSException) as e:
             res.success = False
@@ -75,7 +77,8 @@ class gazebo_arm_control():
             if self.use_sim:
                 self.pub_arm(joint_value)
             else:
-                self.bot.arm.set_joint_positions(joint_value)
+                moving_time, accel_time = self.calculate_times(joint_value)
+                self.bot.arm.set_joint_positions(joint_value, moving_time=moving_time, accel_time=accel_time)
             res.success = True
         except (rospy.ServiceException, rospy.ROSException) as e:
             res.success = False
@@ -117,7 +120,8 @@ class gazebo_arm_control():
                 if self.use_sim:
                     self.pub_arm(joint_value)
                 else:
-                    self.bot.arm.set_joint_positions(joint_value)
+                    moving_time, accel_time = self.calculate_times(joint_value)
+                    self.bot.arm.set_joint_positions(joint_value, moving_time=moving_time, accel_time=accel_time)
                 time.sleep(0.5)
             res.success = True
         except (rospy.ServiceException, rospy.ROSException) as e:
@@ -167,8 +171,41 @@ class gazebo_arm_control():
         if self.use_sim:
             self.pub_arm(joint_data.position)
         else:
-            self.bot.arm.set_joint_positions(joint_data.position)
+            moving_time, accel_time = self.calculate_times(joint_data.position)
+            self.bot.arm.set_joint_positions(joint_data.position, moving_time=moving_time, accel_time=accel_time)
         #print(self.joint_value)
+
+    def calculate_times(self, joint_value):
+        # Get current joint positions
+        current_positions = self.bot.arm.get_joint_commands()
+        
+        # Calculate the maximum distance to be moved
+        max_distance = max(abs(curr - target) for curr, target in zip(current_positions, joint_value))
+        
+        # Set base times
+        base_moving_time = 0.3  # seconds for small movements
+        base_accel_time = 0.1   # seconds for small movements
+        
+        # Scale times based on the maximum distance
+        moving_time = base_moving_time + max_distance * 1.5  # Adjust scaling factor as needed
+        accel_time = base_accel_time + max_distance * 0.5  # Adjust scaling factor as needed
+        
+        # Ensure accel_time is not more than half of moving_time
+        accel_time = min(accel_time, moving_time / 2)
+        
+        # Check if the velocities are within limits
+        velocity_limits = self.bot.arm.group_info.joint_velocity_limits
+        for curr, target, limit in zip(current_positions, joint_value, velocity_limits):
+            velocity = abs(target - curr) / moving_time
+            if velocity > limit:
+                # Adjust moving_time and accel_time to ensure velocity limits are not exceeded
+                moving_time = abs(target - curr) / limit
+                accel_time = min(accel_time, moving_time / 2)
+        
+        return moving_time, accel_time
+
+
+        
 
 if __name__ == "__main__":
     rospy.init_node("vr_gazebo_arm_control")
