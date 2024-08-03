@@ -171,8 +171,10 @@ class gazebo_arm_control():
         if self.use_sim:
             self.pub_arm(joint_data.position)
         else:
-            moving_time, accel_time = self.calculate_times(joint_data.position)
-            self.bot.arm.set_joint_positions(joint_data.position, moving_time=moving_time, accel_time=accel_time)
+            joint_value = list(joint_data.position)
+            joint_value[4] = -joint_value[4] 
+            moving_time, accel_time = self.calculate_times(joint_value)
+            self.bot.arm.set_joint_positions(joint_value, moving_time=moving_time, accel_time=accel_time)
         #print(self.joint_value)
 
     def calculate_times(self, joint_value):
@@ -214,10 +216,18 @@ if __name__ == "__main__":
     initial = rospy.get_param("~initial")
     gazebo_arm_control(robot_name, sim)
     if initial:
-        rospy.wait_for_service("/initial")
-        try:
-            initial = rospy.ServiceProxy("/initial", Trigger)
-            initial()
-        except rospy.ServiceException as e:
-            print("Service call failed: %s"%e)
+        if sim:
+            rospy.wait_for_service("/initial")
+            try:
+                initial = rospy.ServiceProxy("/initial", Trigger)
+                initial()
+            except rospy.ServiceException as e:
+                print("Service call failed: %s"%e)
+        else:
+            rospy.wait_for_service("/grasp_pose")
+            try:
+                initial = rospy.ServiceProxy("/grasp_pose", Trigger)
+                initial()
+            except rospy.ServiceException as e:
+                print("Service call failed: %s"%e)
     rospy.spin()

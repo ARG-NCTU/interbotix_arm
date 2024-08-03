@@ -23,17 +23,8 @@
 		<param name="keyboard_control" value="$(arg debug)"/>
 	</node>
 
-	<group if="$(arg use_sim)">
-		<node name="endeffector_fix" pkg="gazebo_arm_control" type="endeffector_rotate_fix.py">
-			<remap from="joint_states" to="$(arg robot_name)/joint_states"/>
-			<remap from="joint_states_fix" to="$(arg robot_name)/joint_states_fix"/>
-		</node>
-	</group>
-	
-	<group unless="$(arg use_sim)">
-		<node pkg="topic_tools" type="relay" name="relay_joint_states" args="/wx200/joint_states /wx200/joint_states_fix">
-      		<param name="unreliable" value="true"/>
-    	</node>
-	</group>
-
+	<node name="endeffector_fix" pkg="gazebo_arm_control" type="endeffector_rotate_fix.py">
+		<remap from="joint_states" to="$(arg robot_name)/joint_states"/>
+		<remap from="joint_states_fix" to="$(arg robot_name)/joint_states_fix"/>
+	</node>
 </launch>
